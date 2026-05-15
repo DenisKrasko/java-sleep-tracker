@@ -1,6 +1,5 @@
 package ru.yandex.practicum.sleeptracker;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
