@@ -12,39 +12,29 @@ public class ChronotypeAnalytics implements Function<List<SleepSession>, SleepAn
 		if (sessions == null || sessions.isEmpty()) {
 			throw new IllegalArgumentException("Список сессий сна пуст");
 		}
-		int owl = 0;
-		int lark = 0;
-		int pigeon = 0;
+		int owlCount = 0;
+		int larkCount = 0;
+		int pigeonCount = 0;
 		for (SleepSession session : sessions) {
-			LocalDate startDate = session.getStartSleep().toLocalDate();
-			LocalDate endDate = session.getFinishSleep().toLocalDate();
-			LocalDateTime targetStart1 = LocalDateTime.of(startDate, LocalTime.MIDNIGHT);
-			LocalDateTime targetEnd1 = LocalDateTime.of(startDate, LocalTime.of(6, 0));
-			LocalDateTime targetStart2 = LocalDateTime.of(endDate, LocalTime.MIDNIGHT);
-			LocalDateTime targetEnd2 = LocalDateTime.of(endDate, LocalTime.of(6, 0));
-			boolean isNightSession = (session.getStartSleep().isBefore(targetEnd1) && session.getFinishSleep().isAfter(targetStart1)) ||
-					(session.getStartSleep().isBefore(targetEnd2) && session.getFinishSleep().isAfter(targetStart2));
-			if (!isNightSession) {
-				continue;
-			}
-			java.time.LocalTime startTimeSleep = session.getStartSleep().toLocalTime();
-			java.time.LocalTime endTimeSleep = session.getFinishSleep().toLocalTime();
-			if ((startTimeSleep.isAfter(LocalTime.of(23, 0))
-					&& endTimeSleep.isAfter(LocalTime.of(9, 0)))
-					|| (startTimeSleep.isAfter(LocalTime.of(0, 0))
-					&& endTimeSleep.isAfter(LocalTime.of(9, 0)))) {
-				owl++;
-			} else if (startTimeSleep.isBefore(LocalTime.of(22, 0))
-					&& endTimeSleep.isBefore(LocalTime.of(7, 0))) {
-				lark++;
-			} else {
-				pigeon++;
+			if (isNightSession(session)) {
+				Chronotype chronotype = classifySessionChronotype(session);
+				switch (chronotype) {
+					case OWL:
+						owlCount++;
+						break;
+					case LARK:
+						larkCount++;
+						break;
+					case PIGEON:
+						pigeonCount++;
+						break;
+				}
 			}
 		}
-		String userChronotype = determinationChronotype(owl, lark, pigeon);
+		String userChronotype = determinationChronotype(owlCount, larkCount, pigeonCount);
 		return new SleepAnalysisResult(
 				"Хронотип пользователя: ",
-				String.valueOf(userChronotype)
+				userChronotype
 		);
 	}
 
@@ -61,6 +51,35 @@ public class ChronotypeAnalytics implements Function<List<SleepSession>, SleepAn
 			return "жаворонок";
 		} else {
 			return "голубь";
+		}
+	}
+
+	private boolean isNightSession(SleepSession session) {
+		LocalDate startDate = session.getStartSleep().toLocalDate();
+		LocalDate endDate = session.getFinishSleep().toLocalDate();
+		LocalDateTime targetStart1 = LocalDateTime.of(startDate, LocalTime.MIDNIGHT);
+		LocalDateTime targetEnd1 = LocalDateTime.of(startDate, LocalTime.of(6, 0));
+		LocalDateTime targetStart2 = LocalDateTime.of(endDate, LocalTime.MIDNIGHT);
+		LocalDateTime targetEnd2 = LocalDateTime.of(endDate, LocalTime.of(6, 0));
+		return (session.getStartSleep().isBefore(targetEnd1) &&
+						session.getFinishSleep().isAfter(targetStart1)) ||
+				(session.getStartSleep().isBefore(targetEnd2) &&
+						session.getFinishSleep().isAfter(targetStart2));
+	}
+
+	private Chronotype classifySessionChronotype(SleepSession session) {
+		LocalTime startTimeSleep = session.getStartSleep().toLocalTime();
+		LocalTime endTimeSleep = session.getFinishSleep().toLocalTime();
+		if ((startTimeSleep.isAfter(LocalTime.of(23, 0))
+				&& endTimeSleep.isAfter(LocalTime.of(9, 0)))
+				|| (startTimeSleep.isAfter(LocalTime.of(0, 0))
+				&& endTimeSleep.isAfter(LocalTime.of(9, 0)))) {
+			return Chronotype.OWL;
+		} else if (startTimeSleep.isBefore(LocalTime.of(22, 0))
+				&& endTimeSleep.isBefore(LocalTime.of(7, 0))) {
+			return Chronotype.LARK;
+		} else {
+			return Chronotype.PIGEON;
 		}
 	}
 }

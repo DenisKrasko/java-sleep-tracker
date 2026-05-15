@@ -10,11 +10,11 @@ public class SleepSession {
 	private LocalDateTime finishSleep;
 	private SleepCharacterisctics sleepCharacterisctics;
 	private Duration sleepDuration;
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
 	public SleepSession(String session) {
 		this.session = session;
 		String[] split = session.split(";");
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 		this.startSleep = LocalDateTime.parse(split[0], formatter);
 		this.finishSleep = LocalDateTime.parse(split[1], formatter);
 		this.sleepCharacterisctics = SleepCharacterisctics.valueOf(split[2]);
