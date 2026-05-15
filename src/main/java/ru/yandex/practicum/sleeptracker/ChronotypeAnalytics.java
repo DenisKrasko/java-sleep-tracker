@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class ChronotypeAnalytics implements Function<List<SleepSession>, SleepAnalysisResult> {
@@ -24,7 +23,7 @@ public class ChronotypeAnalytics implements Function<List<SleepSession>, SleepAn
 			LocalDateTime targetStart2 = LocalDateTime.of(endDate, LocalTime.MIDNIGHT);
 			LocalDateTime targetEnd2 = LocalDateTime.of(endDate, LocalTime.of(6, 0));
 			boolean isNightSession = (session.getStartSleep().isBefore(targetEnd1) && session.getFinishSleep().isAfter(targetStart1)) ||
-							(session.getStartSleep().isBefore(targetEnd2) && session.getFinishSleep().isAfter(targetStart2));
+					(session.getStartSleep().isBefore(targetEnd2) && session.getFinishSleep().isAfter(targetStart2));
 			if (!isNightSession) {
 				continue;
 			}
