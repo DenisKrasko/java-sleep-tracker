@@ -21,10 +21,9 @@ public class SleepSession {
 		this.sleepDuration = Duration.between(startSleep, finishSleep);
 	}
 
-	static int compareByDurationSleep (SleepSession s1, SleepSession s2) {
+	static int compareByDurationSleep(SleepSession s1, SleepSession s2) {
 		return (int) (s1.sleepDuration.toMinutes() - s2.sleepDuration.toMinutes());
 	}
-
 
 
 	public String getSession() {
